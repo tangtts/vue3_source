@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { reactive } from "/global/core/reactivity.js"
+    import { effect } from "/global/core/effect.js"
+
+
+    const state = reactive({ name: 'jw', age: 30 })
+
+    // effect(() => { // 副作用函数 (effect执行渲染了页面)
+    //   app.innerHTML = state.name + '今年' + state.age + '岁了';
+    //   state.age = Math.random()
+    //   effect(()=>{
+    //     app.innerHTML = state.name + '今年' + state.age + '岁了';
+    //   })
+    // });
+
+    const runner = effect(() => {
+      console.log('runner')
+      document.getElementById('app').innerHTML = state.flag ? state.name : state.age
+    }, { // 类似于watch api的回调
+      scheduler() {      // 组件更新都是基于这个scheduler来实现的
+        setTimeout(() => {
+          runner()
+        }, 1000)
+        console.log('数据变化了',)
+      }
+    })
+
+    // 清除操作： 
+    // 默认第一次 flag 会收集effect  name 收集了我们的effect, 应该将age收集的依赖移除掉，否则更改age还是会触发更新
+    setTimeout(() => {
+      state.flag = !state.flag // 值变化了
+      // setTimeout(() => {
+      //     console.log('修改了age')
+      //     state.age = 31
+      // }, 1000)
+    }, 1000);
+
+
+
+  </script>
+</body>
+
+</html>

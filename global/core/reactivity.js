@@ -1,4 +1,4 @@
-import { isObject } from "./shared.js";
+import { isObject } from "../utils/shared.js";
 import { track, trigger } from "./track.js";
 function createReactiveObject(target, isReadonly) {
   if (!isObject(target)) {
@@ -49,4 +49,3 @@ export function reactive(target) {
   }
   return createReactiveObject(target, false);
 }
-export default {};
