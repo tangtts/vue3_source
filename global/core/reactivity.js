@@ -1,5 +1,10 @@
 import { isObject } from "../utils/shared.js";
 import { track, trigger } from "./track.js";
+export const ReactiveFlags = {
+  IS_REACTIVE: "__v_isReactive",
+};
+
+
 function createReactiveObject(target, isReadonly) {
   if (!isObject(target)) {
     return target;
@@ -9,14 +14,12 @@ function createReactiveObject(target, isReadonly) {
   if (exisitingProxy) {
     return exisitingProxy;
   }
+
   const proxy = new Proxy(target, mutableHandlers); // 对对象进行代理
   reactiveMap.set(target, proxy);
   return proxy;
 }
 
-const ReactiveFlags = {
-  IS_REACTIVE: "__v_isReactive",
-};
 
 const reactiveMap = new WeakMap(); // 缓存列表
 const mutableHandlers = {

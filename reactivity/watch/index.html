@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { reactive } from "/global/core/reactivity.js"
+    import { effect } from "/global/core/effect.js"
+    import { effectScope } from "/global/core/effectScope.js";
+    import { watch,watchEffect } from "/global/core/watch.js";
+    let state = reactive({name:'zs'})
+    watchEffect(()=>{
+      console.log(state.name)
+    })
+    watch(state,(newVal,oldVal)=>{
+      console.log(newVal,oldVal)
+    })
+
+    // 如果是对象的话，才会递归遍历
+    // 函数的话变不了
+    // watch(()=>state,(newVal,oldVal)=>{
+    //   console.log(newVal,oldVal)
+    // },{immediate:true})
+
+    // // 这种是访问了响应式变量
+    // watch(()=>state.name,(newVal,oldVal)=>{
+    //   console.log(newVal,oldVal)
+    // })
+
+    state.name = 'lisi'
+    // state.name = 'lisi2'
+
+
+  </script>
+</body>
+
+</html>

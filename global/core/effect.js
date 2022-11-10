@@ -1,5 +1,5 @@
 export let activeEffect = undefined;
-
+import {recordEffectScope} from "./effectScope.js"
 // 每次执行依赖收集前，先做清理操作
 function cleanupEffect(effect) {
   // 每次执行effect之前 我们应该清理掉effect中依赖的所有属性
@@ -19,6 +19,8 @@ export class ReactiveEffect {
   constructor(fn, scheduler) {
     this.fn = fn;
     this.scheduler = scheduler;
+    // 放在这里不放在run的意思是这个只需要收集一次，run 可能调用很多次
+    recordEffectScope(this)
   }
   run() {
     if (!this.active) {

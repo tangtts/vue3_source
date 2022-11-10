@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { reactive } from "/global/core/reactivity.js"
+    import { effect } from "/global/core/effect.js"
+    import { effectScope } from "/global/core/effectScope.js";
+
+
+
+    let scope = effectScope()
+    scope.run(() => {
+      let state = reactive({ age: 30 })
+      let runner = effect(() => {
+        // 只会执行一次
+        console.log(state.age)
+      });
+      setTimeout(() => { state.age++ }, 1000);
+
+      // 嵌套作用于
+      let scope = effectScope(false)
+      scope.run(() => {
+        let state = reactive({ age: 40 })
+
+        effect(() => {
+          // 只会执行一次
+          console.log(state.age)
+        })
+
+        setTimeout(() => {state.age++}, 2000);
+      })
+    })
+    scope.stop()
+
+  </script>
+</body>
+
+</html>
