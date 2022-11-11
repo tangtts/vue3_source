@@ -1,4 +1,4 @@
-import {ReactiveFlags} from "../core/reactivity.js"
+import {ReactiveFlags} from "../core/reactive.js"
 export function isObject(value) {
   return typeof value === 'object' && value !== null
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script type="module">
+    import { reactive } from "/global/core/reactive.js"
+    import { effect } from "/global/core/effect.js"
+    import { ref, toRefs, proxyRefs, toRef } from "/global/core/ref.js";
+    let flag = ref(false)
+    // 一般情况下ref 用于处理基本类型, 还有就是用户换整个对象的时候可以采用
+    // 对象类型 我们一般采用  reactive来处理  
+    let person = reactive({ name: 'zf', age: 13 });
+
+    let personRefs = toRefs(person)
+    let r = toRef(person, "name")
+    console.log(r.value)  // 是一个普通值
+
+    effect(() => {
+      // 用户在模板中使用的时候 不用.value的原因就是 内部会将数据用proxyRefs 做处理
+      let { name, age } = proxyRefs(personRefs);
+      app.innerHTML = name
+      console.log(flag.value)
+    })
+
+    setTimeout(() => {
+      personRefs.name.value = 'jw'
+    }, 1000)
+
+    flag.value = false
+
+
+    let o = {
+      age: 30
+    }
+    let o1 = new Proxy(o,{
+      get(target,key,receiver){
+        return Reflect.get(target,key,receiver)
+      },
+      set(target,key,value,receiver){
+        console.log("s1")
+        return Reflect.set(target,key,value,receiver)
+      }
+    });
+
+    let o2 = new Proxy(o1,{
+      get(target,key,receiver){
+        return Reflect.get(target,key,receiver)
+      },
+      set(target,key,value,receiver){
+        console.log("s2")
+        return target[key] = value
+        // return Reflect.set(target,key,value,receiver)
+      }
+    });
+
+    o2.age = "31"
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>
