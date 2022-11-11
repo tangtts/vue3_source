@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module">
+
+        // runtime-dom (提供domapi)  runtime-core （虚拟节点）
+        // import { createRenderer, h, render } from '/node_modules/@vue/runtime-dom/dist/runtime-dom.esm-browser.js';
+        import { h, render } from '/global/runtime-dom/index.js'
+
+        let style = { color: 'red', background: 'blue' };
+        render(h('div', [h('span', '1'), h('span', '2')]), app)
+
+        setTimeout(() => {
+            render(h('div', 'hello'), app)
+        }, 1000)
+
+
+        // h('div',{})
+        // h('div', 'hello')
+        // h('div', ['hello'])
+        // h('div', h('span'))
+
+        // watch / computed ...  > effect
+
+        // import { h, render } from './runtime-dom.esm.js'
+        // render(h('div', 'hello world'), app)
+
+
+        // runtime-dom 提供浏览器的api操作方法
+        // runtime-core 只是虚拟dom ， 会调用上层runtime-dom提供的方法
+        // const { render } = createRenderer({
+        //     createElement(tagName) {
+        //         // 创建canvas 画布
+        //         // 小程序
+        //         return document.createElement(tagName)
+        //     },
+        //     setElementText(el, text) {
+        //         el.innerHTML = text
+        //     },
+        //     insert(el, container) {
+        //         container.appendChild(el)
+        //     }
+        // });
+        // render(h('div', 'hello world'), app)
+
+
+    </script>
+</body>
+
+</html>

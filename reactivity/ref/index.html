@@ -37,37 +37,6 @@
     flag.value = false
 
 
-    let o = {
-      age: 30
-    }
-    let o1 = new Proxy(o,{
-      get(target,key,receiver){
-        return Reflect.get(target,key,receiver)
-      },
-      set(target,key,value,receiver){
-        console.log("s1")
-        return Reflect.set(target,key,value,receiver)
-      }
-    });
-
-    let o2 = new Proxy(o1,{
-      get(target,key,receiver){
-        return Reflect.get(target,key,receiver)
-      },
-      set(target,key,value,receiver){
-        console.log("s2")
-        return target[key] = value
-        // return Reflect.set(target,key,value,receiver)
-      }
-    });
-
-    o2.age = "31"
-
-
-
-
-
-
   </script>
 </body>
 
