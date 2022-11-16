@@ -345,7 +345,12 @@ export function createRenderer(options) {
     }
     // ...
   };
-  const unmount = vnode => hostRemove(vnode.el);
+  const unmount = vnode => {
+    if(vnode.type == Fragment){
+    return  unmountChildren(vnode.children)
+    }
+    hostRemove(vnode.el)
+  };
   const render = (vnode, container) => {
     if (vnode == null) {
       // 卸载：删除节点
