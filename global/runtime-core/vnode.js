@@ -5,6 +5,9 @@ import { isString, ShapeFlags } from "../utils/shared.js";
 export function isVNode(vnode) {
   return vnode.__v_isVnode == true;
 }
+// 创建对应的文本/类型
+export const Text = Symbol("text");
+export const Fragment = Symbol("fragment");
 
 export function isSameVNode(n1, n2) {
   return n1.type === n2.type && n1.key === n2.key;

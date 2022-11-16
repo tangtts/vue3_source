@@ -17,10 +17,11 @@
         import { h, render } from '/global/runtime-dom/index.js'
 
         let style = { color: 'red', background: 'blue' };
-        render(h('div', [h('span', '1'), h('span', '2')]), app)
+        // render(h('div', [h('span', '1'), h('span', '2')]), app)
+        render(h('div', "hello"), app)
 
         setTimeout(() => {
-            render(h('div', 'hello'), app)
+            render(h('div', 'world'), app)
         }, 1000)
 
 

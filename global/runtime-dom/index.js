@@ -9,6 +9,7 @@ import { createRenderer } from "../runtime-core/index.js";
 const renderOptions = Object.assign(nodeOps, { patchProp });
 
 export {h} from "../runtime-core/h.js"
+export { Text } from "../runtime-core/vnode.js"
 // dom操作api
 
 export const render = (vnode, container) => {
