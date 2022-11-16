@@ -7,7 +7,7 @@ export const nodeOps = {
   insert(child, parent, anchor) {
     // 移动性的
     // A B C D  -> A C B  D
-    parent.inhostSetTextsertBefore(child, anchor || null); // parent.appendChild(child)
+    parent.insertBefore(child, anchor || null); // parent.appendChild(child)
   },
   remove(child) {
     const parent = child.parentNode;
