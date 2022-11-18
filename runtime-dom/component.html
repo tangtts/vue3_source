@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module">
+        import { h, render,Text } from '/global/runtime-dom/index.js'
+
+        
+        const VueComponent = {
+            props: { // propOptions
+                a: Number
+            },
+            data() {
+                return { age: 30, name: 'jw' }
+            },
+            render() { // effect  响应式数据的关系
+                // 更新逻辑不能写在render
+                // console.log(this.$attrs, this.$props)
+                this.age++
+                // setTimeout(() => {
+                //     this.age++
+                //     this.age++
+                //     this.age++
+                // }, 1000)
+
+
+                return h('div', [h(Text, this.age), h(Text, this.name), h(Text, this.a)])
+            }
+        }
+        // type === 'object' 就是组件了
+        render(h(VueComponent, { a: 1, b: 2, c: 3 }), app)
+    </script>
+</body>
+
+</html>
+
+<template>123</template>

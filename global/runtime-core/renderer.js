@@ -1,7 +1,10 @@
 import { ShapeFlags } from "../utils/shared.js";
 import { isSameVNode,Text,Fragment } from "./vnode.js";
 import { getSequence } from "../../getSequence.js";
-
+import {initProps} from "./componentProps.js"
+import { ReactiveEffect } from "../core/effect.js";
+import { reactive } from "../core/reactive.js";
+import {queueJob} from "./scheduler.js"
 export function createRenderer(options) {
   const {
     insert: hostInsert,
@@ -315,6 +318,103 @@ export function createRenderer(options) {
     }
   };
   
+
+  const mountComponent =(vnode, container, anchor )=>{
+    // type 也许是个 字符串 ，也许是个对象
+    const { data = () => ({}), render, props: propsOptions = {} } = vnode.type;
+    const state = reactive(data()); // 将数据变成响应式的
+    const instance = {
+      // 组件的实例
+      data: state,
+      isMounted: false,
+      subTree: null, // 里面的 render 返回的结果
+      vnode,
+      update: null, // 组件的更新方法 effect.run()
+      props: {},
+      attrs: {},
+      propsOptions,
+      proxy: null,
+    };
+    vnode.component = instance; // 让虚拟节点知道对应的组件是谁
+    initProps(instance, vnode.props);
+
+    
+    const publicProperties = {
+      $attrs: (i) => i.attrs,
+      $props: (i) => i.props,
+    };
+    instance.proxy = new Proxy(instance, {
+      get(target, key) {
+
+        let { data, props } = target;
+
+        if (Object.prototype.hasOwnProperty.call(data,key)) {
+
+          return data[key];
+
+        } else if (Object.prototype.hasOwnProperty.call(props,key)) {
+
+          return props[key];
+
+        }
+
+        let getter = publicProperties[key];
+        if (getter) {
+          return getter(target);
+        }
+      },
+      set(target, key, value) {
+        let { data, props } = target;
+        if (Object.prototype.hasOwnProperty.call(data,key)) {
+          data[key] = value;
+        } else if (Object.prototype.hasOwnProperty.call(props,key)) {
+          console.log("warn ");
+          return false;
+        }
+        return true;
+      },
+    });
+
+    const componentFn = () => {
+      if (!instance.isMounted) {
+        // 稍后组件更新 也会执行此方法
+        const subTree = render.call(instance.proxy); // 这里会做依赖收集，数据变化会再次调用effect
+        patch(null, subTree, container, anchor);
+        instance.subTree = subTree; // 第一次渲染产生的vnode
+        instance.isMounted = true;
+      } else {
+        const subTree = render.call(instance.proxy);
+        patch(instance.subTree, subTree, container, anchor);
+        instance.subTree = subTree;
+      }
+    };
+
+    const effect = new ReactiveEffect(componentFn, () => {
+      // 我需要做异步更新
+      queueJob(instance.update);
+    });
+    const update = (instance.update = effect.run.bind(effect));
+    update(); // 强制更新
+  }
+
+
+
+
+ const processComponent = ( n1, n2, container, anchor = null)=>{
+  if (n1 == null) {
+    // 组件初次渲染
+    mountComponent(n2, container, anchor);
+  } else {
+    // 组件更新  指代的是组件的属性 更新、插槽更新
+    let instance = (n2.component = n1.component);
+    instance.props.a = n2.props.a;
+
+    // todo...
+  }
+
+ }
+
+
   const patch = (n1, n2, container, anchor = null) => {
     if (n1 == n2) {
       return; // 无需更新

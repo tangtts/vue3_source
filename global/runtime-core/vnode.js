@@ -1,4 +1,4 @@
-import { isString, ShapeFlags } from "../utils/shared.js";
+import { isString, ShapeFlags,isObject } from "../utils/shared.js";
 
 // children 数组 字符串 空
 
@@ -18,7 +18,24 @@ export function createVNode(type, props = null, children = null) {
   // 文本
   // 自定义的keep-alive..
   // 用标识来区分 对应的虚拟节点类型 ， 这个表示采用的是位运算的方式 可以方便组合
-  const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : 0;
+
+// isObject 表示传入的是一个 组件 
+/*
+  { 
+    data(){
+      return {}
+    }
+    
+  }
+*/
+
+  const shapeFlag = 
+  isString(type)
+    ? ShapeFlags.ELEMENT
+    : isObject(type)
+    ? ShapeFlags.COMPONENT
+    : 0;
+
   // 虚拟节点要对应真实节点
   const vnode = {
     __v_isVnode: true, // 添加标识是不是vnode
