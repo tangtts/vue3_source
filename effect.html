@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    #app{
+      width: 100px;
+      height: 100px;
+      background-color: antiquewhite;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script>
+
+    document.getElementById("app").addEventListener("click",function(e){
+      console.log(this.offsetTop)
+    })
+
+    let activeEffect = undefined;
+    function reactive(obj) {
+      let depsMap = new WeakMap;
+      return new Proxy(obj, {
+        get(target, key, receive) {
+          let depMap = depsMap.get(target)
+          if (!depMap) {
+            depsMap.set(target, (depMap = new Map))
+          }
+
+          let deps = depMap.get(key)
+          if (!deps) {
+            depMap.set(key, (deps = new Set))
+          }
+          /*  
+              ****************************************
+              ****************************************
+              ****************************************
+           */
+          deps.add(activeEffect)
+          let s = new Set;
+          activeEffect.deps.push(deps)
+
+          return Reflect.get(target, key, receive)
+        },
+        set(target, key, value, receive) {
+          let depMap = depsMap.get(target)
+          let deps = depMap.get(key)
+          let r = Reflect.set(target, key, value, receive)
+          deps.forEach(effect => {
+            effect.run()
+          })
+          return r
+        }
+      })
+    }
+
+    class EffectReactive {
+      constructor(fn) {
+        this.fn = fn;
+        this.deps = [];
+        this.parent = undefined;
+        this.active  = true
+      }
+      run() {
+        if(!this.active) return;
+        console.log(123)
+        try {
+          this.parent = activeEffect; // 当前的effect就是他的父亲
+          activeEffect = this;
+          return this.fn()
+        } finally {
+          activeEffect = this.parent;
+          this.parent = undefined;
+        }
+      }
+      stop() {
+        // stop 阻止二次执行
+        if(!this.active)return;
+        this.active = false
+        this.deps.forEach(dep => {
+          dep.delete(this)
+        });
+        this.deps.length = 0
+        console.log(this.deps,this)
+      }
+    }
+    function effect(fn) {
+      let _effect = new EffectReactive(fn)
+      _effect.run();
+      const runner = _effect.run.bind(_effect);
+      runner.effect = _effect;
+      return runner;
+    }
+
+    let state = reactive({
+      name: "zs",
+      age: 20
+    })
+
+    let effce1 = effect(() => {
+      app.innerHTML = state.name + '--&--' + state.age
+    })
+
+    setTimeout(() => {
+      effce1()
+    }, 1000)
+
+    effce1.effect.stop()
+    state.name = 'lisi'
+    setTimeout(() => {
+      state.age = 30
+    }, 2000)
+
+
+
+
+
+
+
+
+
+    function Foo () {
+ getName = function () {
+   console.log(1);
+ }
+ return this;
+}
+// b
+Foo.getName = function () {
+ console.log(2);
+}
+// c
+Foo.prototype.getName = function () {
+ console.log(3);
+}
+// d
+var getName = function () {
+ console.log(4);
+}
+// e
+function getName () {
+ console.log(5);
+}
+
+Foo.getName(); //2
+getName(); // 4
+Foo().getName(); //1
+getName(); //1
+new Foo.getName(); //2
+new Foo().getName(); // 3
+new new Foo().getName(); // 3
+  </script>
+</body>
+
+</html>
